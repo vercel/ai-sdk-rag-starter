@@ -12,3 +12,13 @@ This project will use the following stack:
 - [Drizzle ORM](https://orm.drizzle.team)
 - [Postgres](https://www.postgresql.org/) with [ pgvector ](https://github.com/pgvector/pgvector)
 - [shadcn-ui](https://ui.shadcn.com) and [TailwindCSS](https://tailwindcss.com) for styling
+
+## Running postgres database locally using docker
+
+You can run the postgres database locally using docker. You can use the following command to run the postgres database:
+
+```bash
+docker compose up -d
+```
+
+Then set the `DATABASE_URL` environment variable to `DATABASE_URL=postgres://user:password@localhost:5432/db` in a `.env` file.
