@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    # volumes:
+      # - ./sql/:/docker-entrypoint-initdb.d/
+      # - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql
+    environment:
+      - POSTGRES_PASSWORD=tuki123
+      - POSTGRES_USER=nacho
+      - POSTGRES_DB=verceldb
+    healthcheck:
+      test:
+        ["CMD", "psql", "-U", "verceldb", "-c", "SELECT 1", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # volumes:
+    # postgres-db-volume:
