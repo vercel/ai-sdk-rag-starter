@@ -48,6 +48,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-mathjax": "^1.0.4",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.22.7",
     "eslint": "^8",

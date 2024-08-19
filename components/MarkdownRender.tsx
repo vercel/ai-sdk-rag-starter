@@ -3,9 +3,9 @@ import MathJax from 'react-mathjax';
 import RemarkMathPlugin from 'remark-math';
 
 type MarkdownRenderProps = {
-    children: React.ReactNode;
-    plugins: any;
-    renderers: any;
+    children: string;
+    plugins?: any;
+    renderers?: any;
 }
 
 type MathProps = {
@@ -13,9 +13,11 @@ type MathProps = {
 }
 
 const MarkdownRender = (props: MarkdownRenderProps) => {
+
+    let children = props.children;
     
-    const newProps = {
-        ...props,
+    let newProps = {
+        ... props,
         remarkPlugins: [
           RemarkMathPlugin,
         ],
@@ -30,8 +32,10 @@ const MarkdownRender = (props: MarkdownRenderProps) => {
     }
 
     return (
-    <MathJax.Provider input="tex">
-        <ReactMarkdown {...newProps} />
+    <MathJax.Provider>
+        <ReactMarkdown {...newProps}>
+            {children}
+        </ReactMarkdown>
     </MathJax.Provider>
     );
 }

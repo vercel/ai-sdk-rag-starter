@@ -97,6 +97,9 @@ devDependencies:
   '@types/react-dom':
     specifier: ^18
     version: 18.3.0
+  '@types/react-mathjax':
+    specifier: ^1.0.4
+    version: 1.0.4
   dotenv:
     specifier: ^16.4.5
     version: 16.4.5
@@ -1759,6 +1762,12 @@ packages:
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
     dependencies:
       '@types/react': 18.3.3
+
+  /@types/react-mathjax@1.0.4:
+    resolution: {integrity: sha512-gxtONNuQUZhNOKeQGxLGxeeqvPc2gBGMFB8t+7WnXQBHQdp+MEhd1Ycnvxjycnxsko87k/0sYooVgLBsIWU6VQ==}
+    dependencies:
+      '@types/react': 18.3.3
+    dev: true
 
   /@types/react@18.3.3:
     resolution: {integrity: sha512-hti/R0pS0q1/xx+TsI73XIqk26eBsISZ2R0wUijXIngRK9R/e7Xw/cXVxQK7R5JjW+SV4zGcn5hXjudkN/pLIw==}
