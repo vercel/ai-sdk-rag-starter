@@ -1,12 +1,8 @@
-import { NextResponse } from 'next/server';
 import { openai } from '@ai-sdk/openai';
 import { convertToCoreMessages, streamText } from 'ai';
 
-export async function POST(req: Request) {
+export async function zapierTool(query: string) {
     try {
-        const { query } = await req.json();
-
-        // URL del Webhook de Zapier para consultar Google Calendar
         const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/19734308/249kyun/';
 
         // Enviar la consulta a Zapier
@@ -20,16 +16,16 @@ export async function POST(req: Request) {
 
         const zapierResult = await zapierResponse.json();
 
-        // Opcional: Integrar la respuesta de Zapier con un modelo de IA
+        // Integrar la respuesta de Zapier con el modelo de IA
         const result = await streamText({
             model: openai('gpt-4o'),
             messages: convertToCoreMessages(zapierResult),
-          });
+        });
 
-          return result.toDataStreamResponse();
-          
+        return result.toDataStreamResponse();
+        
     } catch (error) {
         console.error('Error en la comunicación con Zapier:', error);
-        return NextResponse.json({ success: false, message: 'Error, por favor intenta nuevamente.' }, { status: 500 });
+        throw new Error('Error, por favor intenta nuevamente.');
     }
 }
