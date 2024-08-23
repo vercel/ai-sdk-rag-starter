@@ -10,10 +10,10 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
-  const result = await streamText({
+  const result = await streamText ({
     model: openai('gpt-4o'),
     messages: convertToCoreMessages(messages),
-    system: `You are a helpful assistant. Check your knowledge base before answering any questions.
+    system: `You are a helpful assistant. Your name is Mirai. Check your knowledge base before answering any questions.
     Only respond to questions using information from tool calls.
     if no relevant information is found in the tool calls, respond, "Sorry, I don't know."`,
     tools: {
