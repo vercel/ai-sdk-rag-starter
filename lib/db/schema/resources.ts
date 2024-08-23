@@ -11,6 +11,9 @@ export const resources = pgTable("resources", {
     .$defaultFn(() => nanoid()),
   content: text("content").notNull(),
 
+  // Agregamos un campo opcional para `filePath`
+  filePath: varchar("file_path", { length: 255 }).default(sql`NULL`),
+
   createdAt: timestamp("created_at")
     .notNull()
     .default(sql`now()`),
@@ -21,7 +24,10 @@ export const resources = pgTable("resources", {
 
 // Schema for resources - used to validate API requests
 export const insertResourceSchema = createSelectSchema(resources)
-  .extend({})
+  .extend({
+    // Añadimos `filePath` como un campo opcional en el schema de validación
+    filePath: z.string().optional().nullable(),
+  })
   .omit({
     id: true,
     createdAt: true,
@@ -30,3 +36,4 @@ export const insertResourceSchema = createSelectSchema(resources)
 
 // Type for resources - used to type API request params and within Components
 export type NewResourceParams = z.infer<typeof insertResourceSchema>;
+
