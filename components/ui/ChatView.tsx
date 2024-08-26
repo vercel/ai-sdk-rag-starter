@@ -46,7 +46,11 @@ export const ChatView: React.FC<ChatViewProps> = ({
 
           {/* Messages */}
           {messages.map((message) => (
-            <Message key={message.id} message={message} />
+            !message.toolInvocations ? (
+              <Message key={message.id} message={message} />
+            ) : (
+              null
+            )
           ))}
         </div>
       </div>
