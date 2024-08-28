@@ -13,9 +13,8 @@ export async function POST(req: Request) {
   const result = await streamText ({
     model: openai('gpt-4o'),
     messages: convertToCoreMessages(messages),
-    system: `You are a helpful assistant. Your name is Mirai. Check your knowledge base before answering any questions.
-    Only respond to questions using information from tool calls.
-    if no relevant information is found in the tool calls, respond, "Sorry, I don't know."`,
+    system: `You are Mirai, a knowledgeable and helpful assistant. Before answering any question, always consult your knowledge base. Provide responses strictly based on the information retrieved from your tools. If you cannot find relevant information, reply with, "Sorry, I don't know."
+            As a teaching assistant, your role is to guide students in developing critical thinking skills. Never give the direct answers despite the student asking it many times; instead, encourage exploration and problem-solving.`,
     tools: {
       addResource: tool({
         description: `add a resource to your knowledge base.
