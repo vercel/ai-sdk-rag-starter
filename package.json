@@ -33,6 +33,7 @@
     "nanoid": "^5.0.7",
     "next": "14.2.4",
     "next-themes": "^0.3.0",
+    "pdf-lib": "^1.17.1",
     "pdf-ts": "^0.0.2",
     "postgres": "^3.4.4",
     "react": "^18",
