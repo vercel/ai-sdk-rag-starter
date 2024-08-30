@@ -1,11 +1,11 @@
-// import { pdfToText } from 'pdf-ts';
+import { pdfToText } from 'pdf-ts';
 import { createResource } from '@/lib/actions/resources';
 
 import { PDFDocument } from "pdf-lib";
 import * as fs from "fs";
 import * as path from "path";
 
-const pdf2md = require("@opendocsg/pdf2md");
+// const pdf2md = require("@opendocsg/pdf2md");
 
 async function splitPdfConvert2MdCreateResource(
   filePath: string,
@@ -36,7 +36,7 @@ async function splitPdfConvert2MdCreateResource(
     const pdfUint8Array = new Uint8Array(pdfBuffer);
 
     try {
-      const text = await pdf2md(pdfUint8Array, {});
+      const text = await pdfToText(pdfUint8Array, {});
       console.log("Conversión exitosa.");
 
       // CreateResource with text
