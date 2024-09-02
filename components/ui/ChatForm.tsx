@@ -1,6 +1,7 @@
 import React from 'react';
 import { Send, Home, User } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 type HandleSubmitType = (e: React.FormEvent<HTMLFormElement>) => void;
 type HandleInputChangeType = (
@@ -21,12 +22,14 @@ const ChatForm: React.FC<FormProps> = ({ input, handleInputChange, handleSubmit 
       onSubmit={handleSubmit}
       className="flex items-center justify-center w-full px-4 gap-4"
     >
+      <Link href="/landing" passHref>
       <button
         type="button"
         className="h-14 w-14 bg-white text-black rounded-full border border-gray-100 border-4 flex items-center justify-center transition-all hover:bg-gray-100 flex-shrink-0"
       >
         <Image src="/menu-icon.svg" alt="Menu" width={36} height={36} />
       </button>
+      </Link>
       <div className="relative flex-grow">
         <input
           className="w-full h-14 px-4 border rounded-full pr-20 bg-gray-100 text-black text-lg font-normal placeholder-gray-400 focus:outline-none"
@@ -44,12 +47,14 @@ const ChatForm: React.FC<FormProps> = ({ input, handleInputChange, handleSubmit 
           <Send className="h-6 w-6 rotate fill-black mt-0.5 mr-0.5" />
         </button>
       </div>
+      <Link href="/profile" passHref>
       <button
         type="button"
         className="h-14 w-14 bg-white text-black rounded-full border-4 border-gray-100 flex items-center justify-center transition-all hover:bg-gray-100 flex-shrink-0 p-0 overflow-hidden relative"
       >
         <Image src="/profile.png" alt="Profile" layout="fill" objectFit="cover" />
       </button>
+      </Link>
     </form>
   );
 };
