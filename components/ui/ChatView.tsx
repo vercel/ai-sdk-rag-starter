@@ -61,10 +61,10 @@ export const ChatView: React.FC<ChatViewProps> = ({
         <div className="max-w-[48rem] mx-auto py-10 space-y-4">
         {/* Display title and description */}
           {!conversationStarted && (
-            <div className="text-center mb-8 mt-10">
-              <div className="flex justify-center mb-4">
+            <div className="text-center mt-20">
+              {/* <div className="flex justify-center mb-4">
                 <MiraiIcon width={64} height={64} />
-              </div>
+              </div> */}
               <h1 className="text-4xl font-normal mb-2">{title}</h1>
               <p className="text-lg text-gray-600">{description}</p>
             </div>
