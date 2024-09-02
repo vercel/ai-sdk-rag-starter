@@ -6,6 +6,7 @@ import { ChatView } from '@/components/ui/ChatView';
 import { SessionProvider, useSession } from "next-auth/react"
 import SessionWrapper from './components/SessionWrapper';
 import Landing from './landing/page';
+import { LoadingView } from './LoadingView';
 
 interface PageProps {
   Component: React.ComponentType<any>;
@@ -37,32 +38,26 @@ export default function Page() {
 
   return (
     <SessionWrapper>
-      {
-        session.status == "loading" && (
-          <main className="flex flex-row items-center justify-center w-lvw h-lvh bg-white">
-            <p>Loading...</p>
-          </main>
-        )
-      }
-
-      {
-        session.status == "authenticated" && (
-          <main className="flex flex-row items-center justify-center w-lvw h-lvh bg-white">
-            <ChatView
-              messages={messages}
-              input={input}
-              handleInputChange={handleInputChange}
-              handleSubmit={handleSubmit}
-              handleSendMessage={handleSendMessage}
-            />
-          </main>
-        )
-      }
-      {
-        session.status == "unauthenticated" && (
-          <Landing />
-        )
-      }
+      <main className="w-lvw h-lvh bg-cover  bg-[url('/no_clouds.png')]">
+        {
+          session.status == "authenticated" && (
+            <div className="flex flex-row items-center justify-center w-lvw h-lvh bg-white">
+              <ChatView
+                messages={messages}
+                input={input}
+                handleInputChange={handleInputChange}
+                handleSubmit={handleSubmit}
+                handleSendMessage={handleSendMessage}
+              />
+            </div>
+          )
+        }
+        {
+          session.status == "unauthenticated" && (
+            <Landing />
+          )
+        }
+      </main>
     </SessionWrapper>
   );
 }
