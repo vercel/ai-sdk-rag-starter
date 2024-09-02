@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { MiraiIcon } from "@/components/brand/MiraiIcon"
+import Link from "next/link"
 
-export default function Component() {
+const Landing = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [showContent, setShowContent] = useState(false)
   const [opacity, setOpacity] = useState(0)
@@ -91,9 +92,16 @@ export default function Component() {
             <p className="text-xl text-gray-600">
               Sign up to our waitlist and get the coolest and newest updates.
             </p>
-            <Button className="w-full py-6 h-14 text-lg font-medium bg-black text-white hover:bg-gray-800 rounded-full">
+            <div className="mt-10">
+              <Link href="/api/auth/signin">
+                <Button className="w-full py-6 h-14 text-lg font-medium bg-black text-white hover:bg-gray-800 rounded-full">
+                  Sign In
+                </Button>
+              </Link>
+            </div>
+            {/* <Button className="w-1/2 py-6 h-14 text-lg font-medium bg-black text-white hover:bg-gray-800 rounded-full">
               Sign Up
-            </Button>
+            </Button> */}
           </div>
 
           <div 
@@ -122,3 +130,5 @@ export default function Component() {
     </div>
   )
 }
+
+export default Landing;
