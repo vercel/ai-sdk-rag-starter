@@ -62,7 +62,9 @@ export default function UserProfileScreen() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8 flex flex-col justify-between">
       <header className="mb-8 flex justify-end">
-        <Button onClick={() => signOut()}>Sign Out</Button>
+      <Button onClick={() => signOut({ redirect: true, callbackUrl: '/' })}>
+        Sign Out
+        </Button>
       </header>
       <main className="flex-grow">
         <User

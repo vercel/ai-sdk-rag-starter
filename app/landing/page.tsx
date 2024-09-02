@@ -95,11 +95,11 @@ const Landing = () => {
             </p>
             <div className="mt-10">
               {/* <Link href="/api/auth/signin"> */}
-                  <Button 
-                    onClick={() => { signIn('github') }}
-                    className="w-full py-6 h-14 text-lg font-medium bg-black text-white hover:bg-gray-800 rounded-full">
-                  Sign In
-                </Button>
+              <Button 
+                onClick={() => signIn('github', { callbackUrl: '/' })}
+                className="w-full py-6 h-14 text-lg font-medium bg-black text-white hover:bg-gray-800 rounded-full">
+                Sign In
+              </Button>
               {/* </Link> */}
             </div>
             {/* <Button className="w-1/2 py-6 h-14 text-lg font-medium bg-black text-white hover:bg-gray-800 rounded-full">
