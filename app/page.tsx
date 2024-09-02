@@ -38,8 +38,9 @@ export default function Page() {
 
   return (
     <SessionWrapper>
-      <main className="w-lvw h-lvh bg-cover  bg-[url('/no_clouds.png')]">
-        {
+      <main className="relative w-full h-full">
+
+      <div className="absolute top-0 left-0 w-full h-full bg-cover bg-[url('/no_clouds.png')] object-cover">        {
           session.status == "authenticated" && (
             <div className="flex flex-row items-center justify-center w-lvw h-lvh bg-white">
               <ChatView
@@ -57,6 +58,7 @@ export default function Page() {
             <Landing />
           )
         }
+        </div>
       </main>
     </SessionWrapper>
   );
