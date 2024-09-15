@@ -42,20 +42,20 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			return installedModules[moduleId].exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
+/******/ 		var module_ = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
 /******/
 /******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __w_pdfjs_require__);
+/******/ 		modules[moduleId].call(module_.exports, module_, module_.exports, __w_pdfjs_require__);
 /******/
 /******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
+/******/ 		module_.l = true;
 /******/
 /******/ 		// Return the exports of the module
-/******/ 		return module.exports;
+/******/ 		return module_.exports;
 /******/ 	}
 /******/
 /******/

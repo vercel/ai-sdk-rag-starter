@@ -773,7 +773,7 @@ const PlanetDrawer = (planets : any) => {
                 Object.entries(planets["planets"]).map(([topic_id, texture]) => (
                 <>
                   <div className="flex flex-row gap-16 h-36 w-full">
-                    <h1 key={topic_id} className="text-white text-md">
+                    <h1 key={topic_id} className="text-white text-md w-1/2">
                       {topic_id} 
                     </h1>
                     <Planet key={topic_id} texture={texture} />
@@ -928,13 +928,13 @@ const Dashboard = () => {
     );
 
     const highlightGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-    const highlightMaterial = new THREE.MeshBasicMaterial(
+    const highlightMaterial = new THREE.MeshStandardMaterial(
       { 
         color: 0xFFFFFF, 
         transparent: true, 
         opacity: 0.4,
-        emissive: 0xffffff,
-        emissiveIntensity: 0.3,
+        // emissive: 0xffffff,
+        // emissiveIntensity: 0.3,
       });
     const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
     highlightMesh.visible = false;
