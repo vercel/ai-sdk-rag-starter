@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Send, ChevronRight,ChevronLeft } from "lucide-react"
 
+import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js';
+
 const topics = [
   {
     "id": 1,
@@ -603,6 +605,91 @@ const topics = [
   }
 ];
 
+const randomColor = () => {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+function getRandomColor() {
+  const color = randomColor();
+  return new THREE.Color(color);
+}
+
+// Shader de fragmento para generar texturas de planetas
+const fragmentShader = `
+  varying vec2 vUv;
+  uniform float time;
+  uniform vec3 color1;
+  uniform vec3 color2;
+  uniform float noiseScale;
+  uniform float noiseStrength;
+
+  float random(vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+  }
+
+  float noise(vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+
+    vec2 u = f * f * (3.0 - 2.0 * f);
+
+    return mix(a, b, u.x) +
+           (c - a) * u.y * (1.0 - u.x) +
+           (d - b) * u.x * u.y;
+  }
+
+  float fbm(vec2 st) {
+    float value = 0.0;
+    float amplitude = 0.5;
+    float frequency = 0.0;
+    for (int i = 0; i < 8; i++) { // Incrementa el número de octavas para más detalles
+      value += amplitude * noise(st);
+      st *= 2.0;
+      amplitude *= 0.5;
+    }
+    return value;
+  }
+
+  void main() {
+    vec2 st = vUv * noiseScale;
+    float n = fbm(st + time * 0.1) * noiseStrength;
+    vec3 color = mix(color1, color2, n);
+    gl_FragColor = vec4(color, 1.0);
+  }
+`;
+
+// Shader de vértice
+const vertexShader = `
+  varying vec2 vUv;
+
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const getPlanetMaterial = () => {
+  return new THREE.ShaderMaterial({
+    vertexShader: vertexShader,
+    fragmentShader: fragmentShader,
+    uniforms: {
+      time: { value: 0 },
+      color1: { value: getRandomColor() },
+      color2: { value: getRandomColor() },
+      noiseScale: { value: Math.random() * 100 + 5 }, // Aumenta la escala del ruido
+      noiseStrength: { value: Math.random() * 1.5 + 0.5 } // Aumenta la fuerza del ruido
+    }
+  });
+}
 
 interface DotData {
   id: number;
@@ -612,6 +699,96 @@ interface DotData {
   mesh: THREE.Mesh;
   explored: boolean;
 }
+const Planet = ({ texture }: { texture: any }) => {
+  // Create a canvas and with Three.js draw a sphere with the given texture
+  const mountRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!mountRef.current) return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+    renderer.setSize(100, 100);
+    mountRef.current.appendChild(renderer.domElement);
+
+    const geometry = new THREE.SphereGeometry(8, 32, 32);
+    const material = texture || getPlanetMaterial();
+    const sphere = new THREE.Mesh(geometry, material);
+
+    scene.add(sphere);
+    camera.position.z = 15;
+    camera.lookAt(0, 0, 0);
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      sphere.rotation.y += 0.01; // Rotar el planeta
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    return () => {
+      mountRef.current?.removeChild(renderer.domElement);
+    };
+  }, [texture]);
+
+  return <div ref={mountRef} className="w-36 h-36" />;
+};
+
+
+const PlanetDrawer = (planets : any) => {
+  // PlanetDrawer component
+  // The user can visualize its saved planets as a list of planets
+  // Given a list of planets, with a title and a texture
+  // Plot the planets in a list
+
+  // planets: {topic_id: texture}
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  
+  useEffect(() => {
+    console.log(Object.entries(planets["planets"]));
+  }, [planets]);
+
+  return (
+    <div className={
+      isOpen ? `fixed top-0 right-0 p-4 w-1/4 h-full flex flex-col bg-black border-l border-gray-800` :
+      `flex fixed top-4 right-4`
+    }>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className={
+          isOpen ? `text-white` :
+          `text-black h-10 w-36 rounded-xl shadow-lg border-l border-gray-800 bg-white`
+        }
+      > {isOpen ? "Close Drawer" : "Open Drawer"} </button>
+    {
+      isOpen && (
+        <div className="">
+            <div className="flex flex-col space-y-4 overflow-y-auto h-full w-full">
+              {
+                Object.entries(planets["planets"]).map(([topic_id, texture]) => (
+                <>
+                  <div className="flex flex-row gap-16 h-36 w-full">
+                    <h1 key={topic_id} className="text-white text-md">
+                      {topic_id} 
+                    </h1>
+                    <Planet key={topic_id} texture={texture} />
+                  </div>
+                </>
+              ))}
+            </div>
+        </div>
+      )
+    }
+    </div>
+  );
+}
+
+
 
 const Dashboard = () => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -625,17 +802,111 @@ const Dashboard = () => {
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [isLearnMode, setIsLearnMode] = useState(false);
 
+  const [planetTextures, setPlanetTextures] = useState<any>({});
+
   useEffect(() => {
     if (!mountRef.current) return;
 
     const scene = new THREE.Scene();
+    
+    const params = {
+      count: 300000,
+      size: 0.01,
+      radius: 10,
+      branches: 3,
+      spin: 1,
+      randomness: 1,
+      randomnessPower: 1,
+      insideColor: "#ff6030",
+      outsideColor: "#1b3984",
+      center: { x: 10, y: 50, z: -20 }
+    };
+
+    const generateGalaxy = (scene: any, params: any, galaxygeometry: any, galaxymaterial: any, galaxypoints: any) => {
+      if (galaxypoints) {
+        scene.remove(galaxypoints);
+        galaxymaterial.dispose();
+        galaxygeometry.dispose();
+      }
+
+      // Galaxy
+
+      galaxygeometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(params.count * 3);
+      const colors = new Float32Array(params.count * 3);
+
+      const colorInside = new THREE.Color(params.insideColor);
+      const colorOutside = new THREE.Color(params.outsideColor);
+
+      for (let i = 0; i < params.count; i++) {
+        const i3 = i * 3;
+
+        const r = Math.random() * params.radius;
+
+        const mixedColor = colorInside.clone();
+        mixedColor.lerp(colorOutside, r / params.radius);
+        colors[i3] = mixedColor.r;
+        colors[i3 + 1] = mixedColor.g;
+        colors[i3 + 2] = mixedColor.b;
+
+        const branchIndex = i % params.branches;
+        const branchAngle = branchIndex / params.branches;
+        const rotation = branchAngle * Math.PI * 2;
+        const spinAngle = r * params.spin;
+
+        const randomX =
+          Math.pow(Math.random(), params.randomnessPower) *
+          (Math.random() - 0.5) *
+          params.randomness *
+          r;
+        const randomY =
+          Math.pow(Math.random(), params.randomnessPower) *
+          (Math.random() - 0.5) *
+          params.randomness *
+          r;
+        const randomZ =
+          Math.pow(Math.random(), params.randomnessPower) *
+          (Math.random() - 0.5) *
+          params.randomness *
+          r;
+
+        // Apply the center to the position of the galaxy
+        positions[i3] = Math.cos(rotation + spinAngle) * r + randomX + params.center.x;
+        positions[i3 + 1] = randomY + params.center.y;
+        positions[i3 + 2] = Math.sin(rotation + spinAngle) * r + randomZ + params.center.z;
+      }
+
+      // Branches
+
+      galaxygeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      galaxygeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const pointsmaterial = new THREE.PointsMaterial({
+        color: params.pointColor,
+        size: params.size,
+        sizeAttenuation: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true
+      });
+
+      galaxypoints = new THREE.Points(galaxygeometry, pointsmaterial);
+      console.log(galaxypoints);
+      scene.add(galaxypoints);
+
+      console.log("generateGalaxy");
+    };
+
+
     sceneRef.current = scene;
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    
     cameraRef.current = camera;
     const renderer = new THREE.WebGLRenderer({ antialias: true });
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0xffffff);
+    // renderer.setClearColor(0xffffff);
+    renderer.setClearColor(0x000000);
     mountRef.current.appendChild(renderer.domElement);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -644,8 +915,57 @@ const Dashboard = () => {
     pointLight.position.set(5, 5, 5);
     scene.add(pointLight);
 
-    const geometry = new THREE.SphereGeometry(0.03, 32, 32);
-    const initialMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+    const geometry = new THREE.SphereGeometry(0.08, 32, 32);
+    const initialMaterial = new THREE.MeshStandardMaterial(
+      { 
+        color: 0xFFFFFF, 
+        roughness: 0.4, 
+        metalness: 0.3, 
+        transparent: false, 
+        emissive: 0xffffff,
+        emissiveIntensity: 1,
+      }
+    );
+
+    const highlightGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+    const highlightMaterial = new THREE.MeshBasicMaterial(
+      { 
+        color: 0xFFFFFF, 
+        transparent: true, 
+        opacity: 0.4,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.3,
+      });
+    const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
+    highlightMesh.visible = false;
+    scene.add(highlightMesh);
+    highlightMeshRef.current = highlightMesh;
+
+    // generateGalaxy(scene, params);
+    // Create random Galaxies for the background
+
+    let galaxyCount = 10;
+
+    for (let i = 0; i < galaxyCount; i++) {
+
+      let galaxygeometry: any = null;
+      let galaxymaterial: any = null;
+      let galaxypoints: any = null;
+
+      generateGalaxy(scene, {
+        count: 300000,
+        size: 0.01,
+        radius: Math.random() * 50 + 10,
+        branches: Math.floor(Math.random() * 5) + 3,
+        spin: Math.random() * 2,
+        randomness: Math.random() * 2,
+        randomnessPower: Math.random() * 3,
+        insideColor: randomColor(),
+        outsideColor: randomColor(),
+        pointColor: randomColor(),
+        center: { x: Math.random() * 120 - 60, y: Math.random() * 120 - 60, z: Math.random() * 120 - 60 }
+      }, galaxygeometry, galaxymaterial, galaxypoints);
+    }
 
     const newDots: DotData[] = topics.map((topic) => {
       const dot = new THREE.Mesh(geometry, initialMaterial.clone());
@@ -664,16 +984,13 @@ const Dashboard = () => {
 
     setDots(newDots);
 
-    const highlightGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-    const highlightMaterial = new THREE.MeshBasicMaterial({ color: 0x86A4FF, transparent: true, opacity: 0.5 });
-    const highlightMesh = new THREE.Mesh(highlightGeometry, highlightMaterial);
-    highlightMesh.visible = false;
-    scene.add(highlightMesh);
-    highlightMeshRef.current = highlightMesh;
-
     const controls = new OrbitControls(camera, renderer.domElement);
     controlsRef.current = controls;
-    camera.position.z = 20;
+    // camera.position.z = 20;
+
+    camera.position.x = 3;
+    camera.position.y = 3;
+    camera.position.z = 3;
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -702,7 +1019,15 @@ const Dashboard = () => {
         if (clickedDot) {
           highlightDot(clickedDot);
           setSelectedDotData(clickedDot);
-          (clickedDot.mesh.material as THREE.MeshStandardMaterial).color.set(0x000000);
+          
+          // (clickedDot.mesh.material as THREE.MeshStandardMaterial).color.set(0x449977);
+          // (clickedDot.mesh.material as THREE.MeshStandardMaterial).transparent = false;
+          // (clickedDot.mesh.material as THREE.MeshStandardMaterial).opacity = 1;
+          // (clickedDot.mesh.material as THREE.MeshStandardMaterial).emissive.set(0x44AA77);
+          // (clickedDot.mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = 1;
+
+          
+          
           clickedDot.explored = true;
           setIsSearchMode(false); // Set to false when a dot is clicked directly
           setIsLearnMode(false); // Reset learn mode when a new dot is clicked
@@ -731,7 +1056,20 @@ const Dashboard = () => {
     dots.forEach(dot => {
       if (Math.floor(dot.id) === baseId || dot.title === title) {
         // Set the highlight material to all matching dots with the same title
-        dot.mesh.material = highlightMaterial.clone();  // Directly assign the new material
+        // dot.mesh.material = highlightMaterial.clone();  // Directly assign the new material
+        // dot.mesh.material = getPlanetMaterial();
+
+        // Create a new planet texture, and save it to the state, so it can be accessed later
+        const planetTexture = planetTextures[`${dot.title}_${dot.id}`] || getPlanetMaterial();
+        dot.mesh.material = planetTexture;
+        var planetTexturesTemp = planetTextures;
+        planetTexturesTemp[`${dot.title}_${dot.id}`] = planetTexture;
+
+        setPlanetTextures(planetTexturesTemp);
+        
+        console.log(`${dot.title}_${dot.id}`)
+        console.log("planetTextures", planetTextures);
+
       }
     });
   };
@@ -887,7 +1225,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-gray-100 text-gray-900 relative">
+    <div className="h-screen w-screen bg-black-100 text-gray-900 relative">
       <div className="absolute top-4 left-4 space-y-4 w-80">
         <Card className="bg-white shadow-lg border border-gray-200 rounded-lg">
           <CardHeader>
@@ -951,7 +1289,11 @@ const Dashboard = () => {
             <Send className='fill-white' size={36}/>
           </Button>
         </form>
+        {/*Planet Drawer */}
       </div>
+        { Object.keys(planetTextures).length > 0 &&
+          <PlanetDrawer planets={planetTextures} />
+        }
     </div>
   );
 };
