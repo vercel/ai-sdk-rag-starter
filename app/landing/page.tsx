@@ -87,11 +87,11 @@ const Landing = () => {
               <MiraiIcon width={48} height={48} />
             </div>
 
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-              Take the Leap into AI for Education.
+            <h1 className="text-3xl font-semi-bold tracking-tight text-gray-900">
+            Potenciando la educación con tecnología.
             </h1>
-            <p className="text-xl text-gray-600">
-              Sign up to our waitlist and get the coolest and newest updates.
+            <p className="text-lg text-gray-600">
+            Accede a lo último en innovación educativa con herramientas de IA.
             </p>
             <div className="mt-10">
               {/* <Link href="/api/auth/signin"> */}
@@ -116,16 +116,16 @@ const Landing = () => {
           >
             <div className="text-left">
               <p className="text-lg font-medium text-grey-900">
-                Get in touch with us.
+                Ponete en contacto con nosotros
               </p>
             </div>
             <div className="flex space-x-4">
               <Button variant="outline" className="rounded-full">
-                Follow us on X
+                Seguinos X
               </Button>
-              <Button variant="outline" className="rounded-full">
+              {/* <Button variant="outline" className="rounded-full">
                 Join Community
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
