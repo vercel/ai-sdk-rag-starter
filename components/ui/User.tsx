@@ -11,17 +11,17 @@ interface UserProps {
     doubtsResolved: number;
   };
 }
-
-export function User({ name, image, stats }: UserProps) {
+const User = ({ name, image, stats }: UserProps) => {
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6">
-      <div className="flex flex-col items-center">
-        <Avatar className="w-24 h-24 border-2">
-          <AvatarImage src={image} alt={name} />
-          <AvatarFallback>{name[0]}</AvatarFallback>
-        </Avatar>
-        <h2 className="mt-4 text-2xl font-bold">{name}</h2>
-      </div>
+    <div className="h-screen flex items-center justify-center p-4 pb-20 overflow-hidden">
+      <div className="w-full max-w-xl space-y-4">
+        <div className="flex flex-col items-center">
+          <Avatar className="w-20 h-20 border-2">
+            <AvatarImage src={image} alt={name} />
+            <AvatarFallback>{name[0]}</AvatarFallback>
+          </Avatar>
+          <h2 className="mt-2 text-xl font-bold">{name}</h2>
+        </div>
 
       <div className="bg-gray-100 p-6 rounded-2xl">
         <div className="bg-white p-4 rounded-xl mb-6">
@@ -111,5 +111,8 @@ export function User({ name, image, stats }: UserProps) {
         </CardContent>
       </Card>
     </div>
+  </div>
   )
 }
+
+export default User
