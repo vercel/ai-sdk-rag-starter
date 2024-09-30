@@ -18,11 +18,13 @@
   "dependencies": {
     "@ai-sdk/openai": "^0.0.48",
     "@opendocsg/pdf2md": "^0.1.31",
+    "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
+    "@radix-ui/react-toggle": "^1.1.0",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@types/three": "^0.168.0",
     "@vercel/postgres": "^0.9.0",
