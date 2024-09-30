@@ -42,11 +42,11 @@ const NiceCard: React.FC<NiceCardProps> = ({
 
   return (
     <div
-      className={`${backgroundColor} rounded-3xl overflow-hidden w-64 h-80 cursor-pointer`}
+      className={`${backgroundColor} rounded-3xl overflow-hidden w-60 h-72 cursor-pointer`}
       onClick={onClick} // Attach onClick event
     >
       <div
-        className={`relative w-full h-40 ${headerColor} flex items-center justify-center`}
+        className={`relative w-full h-32 ${headerColor} flex items-center justify-center`}
         style={{
           borderBottomLeftRadius: '50% 40%',
           borderBottomRightRadius: '50% 40%',

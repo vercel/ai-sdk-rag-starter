@@ -19,6 +19,8 @@ type ChatViewProps = {
   handleInputChange: HandleInputChangeType;
   handleSubmit: HandleSubmitType;
   handleSendMessage: (message: string) => void;
+  subject: string | null;
+  userName: string;
 };
 
 export const ChatView: React.FC<ChatViewProps> = ({
@@ -27,15 +29,17 @@ export const ChatView: React.FC<ChatViewProps> = ({
   handleInputChange,
   handleSubmit,
   handleSendMessage,
+  subject,
+  userName,
 }) => {
   const conversationStarted = messages.length > 0;
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Define your title and description here
-  const subject = "Inteligencia Artificial y Neurociencias";
-  const title = "Bienvenido a IA y Neurociencias";
-  const description = "Aquí encontrarás varios temas y ejercicios sobre los cuales podrás hacer preguntas.";
-
+// Use the passed subject prop instead of hardcoding it
+const title = subject ? `Bienvenido a ${subject}` : `Bienvenido ${userName}`;
+const description = subject
+  ? "Aquí encontrarás varios temas y ejercicios sobre los cuales podrás hacer preguntas."
+  : "Ninguna materia fue seleccionada para aprender en profundidad, pero puede hacer preguntas en general.";
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -46,22 +50,20 @@ export const ChatView: React.FC<ChatViewProps> = ({
 
   return (
     <div className="relative flex flex-col h-full w-full mx-auto stretch">
-      {/* Label with border at the top */}
       {conversationStarted && (
-       <div className="flex justify-center mt-10">
-       <div className="bg-white rounded-full px-6 py-3 shadow-lg mb-4">
-         <div className="flex items-center space-x-2">
-           <h2 className="text-lg font-semibold text-gray-900">{subject}</h2>
-         </div>
-       </div>
-     </div>
+        <div className="sticky top-0 pt-8 z-10 flex justify-center bg-white/80 backdrop-blur-sm py-2 ">
+          <div className="bg-white rounded-full px-6 py-3 shadow-lg">
+            <div className="flex items-center space-x-2">
+              <h2 className="text-lg font-semibold text-gray-900">{subject}</h2>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="flex-grow overflow-y-auto pt-10">
-        <div className="max-w-[48rem] mx-auto py-10 space-y-4">
-        {/* Display title and description */}
+        <div className="max-w-[48rem] mx-auto space-y-4 pb-40">
           {!conversationStarted && (
-            <div className="text-center mt-20">
+            <div className="text-center mt-4 sm:mt-16 md:mt-24 lg:mt-40">
               {/* <div className="flex justify-center mb-4">
                 <MiraiIcon width={64} height={64} />
               </div> */}
@@ -70,7 +72,6 @@ export const ChatView: React.FC<ChatViewProps> = ({
             </div>
           )}
 
-          {/* Messages */}
           {messages.map((message) => (
             !message.toolInvocations ? (
               <Message key={message.id} message={message} />
@@ -79,13 +80,13 @@ export const ChatView: React.FC<ChatViewProps> = ({
             )
           ))}
           
-          <div ref={messagesEndRef} /> {/* This empty div is used as a scroll target */}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
       {/* Cards */}
-      {!conversationStarted && (
-        <div className="flex justify-center w-full my-8">
+      {subject && !conversationStarted && (
+        <div className="flex justify-center w-full mt-8">
           <NiceCards onCardClick={handleSendMessage} />
         </div>
         // <div className="flex justify-center w-full my-8">
@@ -96,13 +97,13 @@ export const ChatView: React.FC<ChatViewProps> = ({
       )}
 
       {/* Chat Form */}
-      <div className="flex-shrink-0 w-full max-w-5xl mx-auto mb-10 px-4">
+      {/* <div className="flex-shrink-0 w-full max-w-5xl mx-auto mb-10 px-4">
         <ChatForm
           input={input}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
         />
-      </div>
+      </div> */}
     </div>
   );
 };
