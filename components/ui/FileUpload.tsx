@@ -23,7 +23,7 @@ export default function FileUploadComponent() {
       setFiles(prevFiles => [...prevFiles, ...validFiles]);
       setUploadSuccess(false);
     } else {
-      alert('Please select valid file types.');
+      alert('Por favor, seleccione tipos de archivo válidos.');
     }
   };
 
@@ -58,22 +58,22 @@ export default function FileUploadComponent() {
           if (response.ok) {
             const { message } = await response.json();
             uploadResults.push({ fileName: file.name, success: true, message });
-            console.log(`Message from server for ${file.name}:`, message);
+            console.log(`Mensaje del servidor para ${file.name}:`, message);
           } else {
             uploadResults.push({ fileName: file.name, success: false });
-            console.error(`Failed to process ${file.name}`);
+            console.error(`Error al procesar ${file.name}`);
           }
         }
       }
 
       if (uploadResults.every(result => result.success)) {
         setUploadSuccess(true);
-        console.log('All files processed successfully!');
+        console.log('¡Todos los archivos se procesaron con éxito!');
       } else {
-        console.error('Some files failed to process.');
+        console.error('Algunos archivos no se pudieron procesar.');
       }
     } catch (error) {
-      console.error('Error processing files:', error);
+      console.error('Error al procesar los archivos:', error);
     } finally {
       setUploading(false);
     }
@@ -86,26 +86,26 @@ export default function FileUploadComponent() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto p-2">
+    <Card className="w-full max-w-md mx-auto p-2 bg-gray-100 rounded-2xl">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold p-4">Upload and add Files</CardTitle>
+        <CardTitle className="text-2xl font-bold p-4">Subir y agregar archivos</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
         <Tabs defaultValue="file" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="file">Your computer</TabsTrigger>
-            <TabsTrigger value="url" disabled>Link URL (WIP)</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-gray-200">
+            <TabsTrigger value="file">Tu computadora</TabsTrigger>
+            <TabsTrigger value="url" disabled>Enlace URL (WIP)</TabsTrigger>
           </TabsList>
           <TabsContent value="file">
             <div className="flex items-center justify-center w-full">
-              <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/50">
+              <label htmlFor="dropzone-file" className="bg-white flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-white/50">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
                   <UploadIcon className="w-10 h-10 mb-4 text-muted-foreground" />
                   <p className="mb-2 text-sm text-muted-foreground">
-                    <span className="font-semibold">Click to upload</span> or drag and drop
+                    <span className="font-semibold">Haz clic para subir</span> o arrastra y suelta
                   </p>
                   <p className="text-xs text-muted-foreground px-4">
-                    Allowed file types: .pdf
+                    Tipos de archivo permitidos: .pdf
                   </p>
                 </div>
                 <Input 
@@ -141,7 +141,7 @@ export default function FileUploadComponent() {
           <TabsContent value="url">
             <div className="flex items-center space-x-2">
               <InfoIcon className="w-6 h-6 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">URL upload is a work in progress and is not available yet.</p>
+              <p className="text-sm text-muted-foreground">La carga de URL está en progreso y aún no está disponible.</p>
             </div>
           </TabsContent>
         </Tabs>
@@ -152,14 +152,14 @@ export default function FileUploadComponent() {
           onClick={handleUpload} 
           disabled={(files.length === 0 && !url) || uploading}
         >
-          {uploading ? 'Processing...' : uploadSuccess ? 'Uploaded Successfully' : 'Upload'}
+          {uploading ? 'Procesando...' : uploadSuccess ? 'Subido con éxito' : 'Subir'}
         </Button>
         {uploadSuccess && (
           <Alert>
             <CheckCircleIcon className="h-4 w-4" />
-            <AlertTitle>Success</AlertTitle>
+            <AlertTitle>Éxito</AlertTitle>
             <AlertDescription>
-              Your file(s) have been uploaded successfully.
+              Tu(s) archivo(s) se han subido con éxito.
             </AlertDescription>
           </Alert>
         )}
@@ -167,4 +167,3 @@ export default function FileUploadComponent() {
     </Card>
   );
 }
-
