@@ -5,14 +5,18 @@ import { PDFDocument } from "pdf-lib";
 import * as fs from "fs";
 import * as path from "path";
 
+import { uploadFile } from '@/lib/actions/cloudinary_upload_file';
+
 // const pdf2md = require("@opendocsg/pdf2md");
 
 async function splitPdfConvert2MdCreateResource(
   filePath: string,
   outputDir: string,
+  fileID: number
 ) {
   // Leer el archivo PDF
   const existingPdfBytes = fs.readFileSync(filePath);
+
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   const numPages = pdfDoc.getPageCount();
 
@@ -38,9 +42,13 @@ async function splitPdfConvert2MdCreateResource(
     try {
       const text = await pdfToText(pdfUint8Array, {});
       console.log("Conversión exitosa.");
-
+      
       // CreateResource with text
-      const result = await createResource({ content: text });
+      const result = await createResource({ 
+        content: text,
+        pageNumber: i + 1,
+        fileID: fileID,
+      });
       console.log(result);
 
       console.log("Hecho.");
@@ -74,13 +82,15 @@ export async function POST(req: Request) {
       const buffer = Buffer.from(arrayBuffer);
       // extractedText = await pdfToText(buffer);
 
+      const fileUploadResult = await uploadFile(buffer, fileName);
+
       // Save the PDF file to /tmp
       const filePath = path.join('/tmp', fileName);
       fs.writeFileSync(filePath, buffer);
 
       // Split the PDF file into individual pages and convert them to Markdown
       const outputDirectory = path.join('/tmp', 'output-pages');
-      await splitPdfConvert2MdCreateResource(filePath, outputDirectory);
+      await splitPdfConvert2MdCreateResource(filePath, outputDirectory, fileID);
 
       return new Response(JSON.stringify({ message: 'PDF successfully processed' }), { status: 200 });
 

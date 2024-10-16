@@ -1,9 +1,183 @@
 {
-  "id": "ab270498-0532-4efe-aac3-bb80ffc07ce2",
+  "id": "f3401fce-5863-4e18-96de-88ea334d5a53",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.embedding": {
+      "name": "embedding",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(191)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "resource_id": {
+          "name": "resource_id",
+          "type": "varchar(191)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "embedding": {
+          "name": "embedding",
+          "type": "vector(1536)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "embeddingIndex": {
+          "name": "embeddingIndex",
+          "columns": [
+            {
+              "expression": "embedding",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "vector_cosine_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "hnsw",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "embedding_resource_id_resources_id_fk": {
+          "name": "embedding_resource_id_resources_id_fk",
+          "tableFrom": "embedding",
+          "tableTo": "resources",
+          "columnsFrom": [
+            "resource_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.file": {
+      "name": "file",
+      "schema": "",
+      "columns": {
+        "ID": {
+          "name": "ID",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "FilePath": {
+          "name": "FilePath",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "FileName": {
+          "name": "FileName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Topic": {
+          "name": "Topic",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "file_Topic_topics_in_subject_ID_fk": {
+          "name": "file_Topic_topics_in_subject_ID_fk",
+          "tableFrom": "file",
+          "tableTo": "topics_in_subject",
+          "columnsFrom": [
+            "Topic"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.question": {
+      "name": "question",
+      "schema": "",
+      "columns": {
+        "ID": {
+          "name": "ID",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Topic": {
+          "name": "Topic",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Student": {
+          "name": "Student",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "LastDate": {
+          "name": "LastDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "question_Topic_topics_in_subject_ID_fk": {
+          "name": "question_Topic_topics_in_subject_ID_fk",
+          "tableFrom": "question",
+          "tableTo": "topics_in_subject",
+          "columnsFrom": [
+            "Topic"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "question_Student_student_ID_fk": {
+          "name": "question_Student_student_ID_fk",
+          "tableFrom": "question",
+          "tableTo": "student",
+          "columnsFrom": [
+            "Student"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.resources": {
       "name": "resources",
       "schema": "",
@@ -17,6 +191,19 @@
         "content": {
           "name": "content",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "page_number": {
+          "name": "page_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "File": {
+          "name": "File",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -36,7 +223,370 @@
         }
       },
       "indexes": {},
+      "foreignKeys": {
+        "resources_File_file_ID_fk": {
+          "name": "resources_File_file_ID_fk",
+          "tableFrom": "resources",
+          "tableTo": "file",
+          "columnsFrom": [
+            "File"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.school": {
+      "name": "school",
+      "schema": "",
+      "columns": {
+        "Code": {
+          "name": "Code",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Location": {
+          "name": "Location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Type": {
+          "name": "Type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.student": {
+      "name": "student",
+      "schema": "",
+      "columns": {
+        "ID": {
+          "name": "ID",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Email": {
+          "name": "Email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Surname": {
+          "name": "Surname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "School": {
+          "name": "School",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Year": {
+          "name": "Year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Password": {
+          "name": "Password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "student_School_school_Code_fk": {
+          "name": "student_School_school_Code_fk",
+          "tableFrom": "student",
+          "tableTo": "school",
+          "columnsFrom": [
+            "School"
+          ],
+          "columnsTo": [
+            "Code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.student_in_subject": {
+      "name": "student_in_subject",
+      "schema": "",
+      "columns": {
+        "ID": {
+          "name": "ID",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Student": {
+          "name": "Student",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Subject": {
+          "name": "Subject",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "student_in_subject_Student_student_ID_fk": {
+          "name": "student_in_subject_Student_student_ID_fk",
+          "tableFrom": "student_in_subject",
+          "tableTo": "student",
+          "columnsFrom": [
+            "Student"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "student_in_subject_Subject_subject_ID_fk": {
+          "name": "student_in_subject_Subject_subject_ID_fk",
+          "tableFrom": "student_in_subject",
+          "tableTo": "subject",
+          "columnsFrom": [
+            "Subject"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.subject": {
+      "name": "subject",
+      "schema": "",
+      "columns": {
+        "ID": {
+          "name": "ID",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Code": {
+          "name": "Code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "School": {
+          "name": "School",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Teacher": {
+          "name": "Teacher",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Year": {
+          "name": "Year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "AuxTeacher": {
+          "name": "AuxTeacher",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "subject_School_school_Code_fk": {
+          "name": "subject_School_school_Code_fk",
+          "tableFrom": "subject",
+          "tableTo": "school",
+          "columnsFrom": [
+            "School"
+          ],
+          "columnsTo": [
+            "Code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "subject_Teacher_teacher_ID_fk": {
+          "name": "subject_Teacher_teacher_ID_fk",
+          "tableFrom": "subject",
+          "tableTo": "teacher",
+          "columnsFrom": [
+            "Teacher"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "subject_AuxTeacher_teacher_ID_fk": {
+          "name": "subject_AuxTeacher_teacher_ID_fk",
+          "tableFrom": "subject",
+          "tableTo": "teacher",
+          "columnsFrom": [
+            "AuxTeacher"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.teacher": {
+      "name": "teacher",
+      "schema": "",
+      "columns": {
+        "ID": {
+          "name": "ID",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Email": {
+          "name": "Email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Name": {
+          "name": "Name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Surname": {
+          "name": "Surname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "School": {
+          "name": "School",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Password": {
+          "name": "Password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "teacher_School_school_Code_fk": {
+          "name": "teacher_School_school_Code_fk",
+          "tableFrom": "teacher",
+          "tableTo": "school",
+          "columnsFrom": [
+            "School"
+          ],
+          "columnsTo": [
+            "Code"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.topics_in_subject": {
+      "name": "topics_in_subject",
+      "schema": "",
+      "columns": {
+        "ID": {
+          "name": "ID",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "Topic": {
+          "name": "Topic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Subject": {
+          "name": "Subject",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "topics_in_subject_Subject_subject_ID_fk": {
+          "name": "topics_in_subject_Subject_subject_ID_fk",
+          "tableFrom": "topics_in_subject",
+          "tableTo": "subject",
+          "columnsFrom": [
+            "Subject"
+          ],
+          "columnsTo": [
+            "ID"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     }

@@ -31,6 +31,7 @@
     "@vercel/postgres": "^0.9.0",
     "ai": "^3.3.9",
     "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.5.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.31.4",
     "drizzle-zod": "^0.5.1",

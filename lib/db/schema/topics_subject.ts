@@ -1,10 +1,12 @@
-import { pgTable, text } from "drizzle-orm/pg-core";
+import { pgTable, serial, text } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
+import { Subject } from "./subject";
 
-export const TopicsInSubject = pgTable("Topics in Subject", {
-  Topic: text("Topic").primaryKey(),
-  Subject: text("Subject").primaryKey(),
+export const TopicsInSubject = pgTable("topics_in_subject", {
+  ID: serial("ID").primaryKey(),
+  Topic: text("Topic"),
+  Subject: serial("Subject").references(() => Subject.ID),
 });
 
 export const selectTopicsSubjectSchema = createSelectSchema(TopicsInSubject, {

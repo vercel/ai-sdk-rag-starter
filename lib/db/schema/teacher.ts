@@ -1,13 +1,14 @@
 import { pgTable, text, char } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
+import { School } from "./school";
 
-export const Teacher = pgTable("Teacher", {
+export const Teacher = pgTable("teacher", {
   ID: text("ID").primaryKey(),
   Email: text("Email").notNull(),
-  Name: char("Name").notNull(),
-  Surname: char("Surname").notNull(),
-  School: text("School").notNull(),
+  Name: text("Name").notNull(),
+  Surname: text("Surname").notNull(),
+  School: text("School").notNull().references(() => School.Code),
   Password: text("Password").notNull(),
 });
 

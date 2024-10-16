@@ -1,8 +1,7 @@
 import { sql } from "drizzle-orm";
-import { text, varchar, timestamp, pgTable,integer, serial } from "drizzle-orm/pg-core";
+import { text, varchar, timestamp, pgTable } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { File } from "./file";
 
 import { nanoid } from "@/lib/utils";
 
@@ -11,8 +10,7 @@ export const resources = pgTable("resources", {
     .primaryKey()
     .$defaultFn(() => nanoid()),
   content: text("content").notNull(),
-  pageNumber: integer("page_number").notNull().default(0),
-  fileID: serial("File").references(() => File.ID),
+
   createdAt: timestamp("created_at")
     .notNull()
     .default(sql`now()`),

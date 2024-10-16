@@ -3,7 +3,7 @@ import { index, pgTable, text, varchar, vector } from 'drizzle-orm/pg-core';
 import { resources } from './resources';
 
 export const embeddings = pgTable(
-  'embedding',
+  'embeddings',
   {
     id: varchar('id', { length: 191 })
       .primaryKey()
