@@ -5,7 +5,8 @@ import { PDFDocument } from "pdf-lib";
 import * as fs from "fs";
 import * as path from "path";
 
-import { uploadFile } from '@/lib/actions/cloudinary_upload_file';
+import { uploadFile2Cloudinary } from '@/lib/actions/cloudinary_upload_file';
+import { createFile } from '@/lib/actions/files';
 
 // const pdf2md = require("@opendocsg/pdf2md");
 
@@ -82,17 +83,41 @@ export async function POST(req: Request) {
       const buffer = Buffer.from(arrayBuffer);
       // extractedText = await pdfToText(buffer);
 
-      const fileUploadResult = await uploadFile(buffer, fileName);
+      const fileUploadResult = await uploadFile2Cloudinary(buffer, fileName);
+      // 
+      // hash the file name to create a unique ID
+      console.log(fileUploadResult);
+      const newId = Math.abs(fileName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0));
+      const uploaded_file_response = await createFile({
+        ID: newId,
+        FilePath: fileUploadResult,
+        FileName: fileName,
+        Topic: 1,
+      });
+      console.log(uploaded_file_response);
+      if (uploaded_file_response.file_id === undefined) {
+        return new Response(
+          JSON.stringify({ message: uploaded_file_response.message }),
+          { status: 500 }
+        );
+      } else {
+        // Save the PDF file to /tmp
+        const filePath = path.join("/tmp", fileName);
+        fs.writeFileSync(filePath, buffer);
 
-      // Save the PDF file to /tmp
-      const filePath = path.join('/tmp', fileName);
-      fs.writeFileSync(filePath, buffer);
+        // Split the PDF file into individual pages and convert them to Markdown
+        const outputDirectory = path.join("/tmp", "output-pages");
+        await splitPdfConvert2MdCreateResource(
+          filePath,
+          outputDirectory,
+          uploaded_file_response.file_id.id
+        );
 
-      // Split the PDF file into individual pages and convert them to Markdown
-      const outputDirectory = path.join('/tmp', 'output-pages');
-      await splitPdfConvert2MdCreateResource(filePath, outputDirectory, fileID);
-
-      return new Response(JSON.stringify({ message: 'PDF successfully processed' }), { status: 200 });
+        return new Response(
+          JSON.stringify({ message: "PDF successfully processed" }),
+          { status: 200 }
+        );
+      }
 
     } 
     

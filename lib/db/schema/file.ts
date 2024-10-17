@@ -18,7 +18,7 @@ export const selectFileSchema = createSelectSchema(File, {
   FilePath: z.string(),
   FileName: z.string(),
   // Subject: z.string(),
-  Topic: z.string(),
+  Topic: z.number(),
 });
 
 export type NewFileParams = z.infer<typeof selectFileSchema>;

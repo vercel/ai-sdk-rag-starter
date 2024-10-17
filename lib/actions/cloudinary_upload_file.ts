@@ -1,21 +1,28 @@
 import cloudinary from '../../cloudinary_config';
 
-export async function uploadFile(fileBuffer: Buffer, fileName: string) {
+export async function uploadFile2Cloudinary(fileBuffer: Buffer, fileName: string) {
     
-    const uploadResult = await cloudinary.uploader
-           .upload_stream(
-                {
-                     public_id: fileName,
-                     resource_type: 'auto',
-                     overwrite: true
-                },
-                (error, result) => {
-                    if (error) {
-                        throw new Error(`Upload failed: ${error.message}`);
-                    }
-                    return result;
+    const uploadResult = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            {
+                public_id: fileName,
+                resource_type: 'auto',
+                overwrite: true
+            },
+            (error: any, result: any) => {
+                if (error) {
+                    reject(new Error(`Upload failed: ${error.message}`));
+                } else {
+                    resolve(result);
                 }
-              ).end(fileBuffer);
+            }
+        );
+        stream.end(fileBuffer);
+    });
 
-    return uploadResult;
+    console.log(`File uploaded to Cloudinary`);
+
+    const url = (uploadResult as any).secure_url;
+
+    return url;
 }
