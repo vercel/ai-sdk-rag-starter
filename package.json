@@ -7,11 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx lib/db/migrate.ts",
+    "db:generate": "supabase gen types typescript --local > lib/database.types.ts",
+    "db:migrate": "supabase db push",
     "db:drop": "drizzle-kit drop",
     "db:pull": "drizzle-kit introspect",
-    "db:push": "drizzle-kit push",
+    "db:push": "supabase db push",
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check"
   },
@@ -35,7 +35,8 @@
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
     "@types/node": "^20",
