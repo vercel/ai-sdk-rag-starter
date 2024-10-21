@@ -43,7 +43,8 @@ async function splitPdfConvert2MdCreateResource(
     try {
       const text = await pdfToText(pdfUint8Array, {});
       console.log("Conversión exitosa.");
-      
+      console.log("page: ", i + 1);
+      console.log("text: ", text);
       // CreateResource with text
       const result = await createResource({ 
         content: text,
