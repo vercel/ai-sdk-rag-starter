@@ -1,88 +1,98 @@
-import { openai } from '@ai-sdk/openai';
-import { convertToCoreMessages, streamText } from 'ai';
+// app/api/chat/route.ts
+import OpenAI from 'openai';
+import { Message } from 'ai';
 import { createClient } from '@supabase/supabase-js';
-import { createResource } from '@/lib/actions/resources';
-import { generateEmbeddings } from '@/lib/ai/embedding';
-import { env } from '@/lib/env.mjs';
+
+// Create OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Initialize Supabase client
 const supabase = createClient(
-  env.NEXT_PUBLIC_SUPABASE_URL,
-  env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
 
 // Function to search the knowledge base
 async function searchKnowledgeBase(query: string) {
   try {
-    const embedding = await generateEmbeddings(query);
+    const { data: embedding } = await openai.embeddings.create({
+      model: 'text-embedding-ada-002',
+      input: query,
+    });
+
     const { data, error } = await supabase.rpc('match_documents', {
-      query_embedding: embedding[0].embedding,
+      query_embedding: embedding.data[0].embedding,
       match_threshold: 0.78,
       match_count: 10
     });
 
-    if (error) {
-      console.error('Error searching knowledge base:', error);
-      return [];
-    }
-
-    return data;
+    if (error) throw error;
+    return data || [];
   } catch (err) {
-    console.error('An error occurred during search:', err);
+    console.error('Error searching knowledge base:', err);
     return [];
   }
 }
 
 export async function POST(req: Request) {
   try {
-    const { messages }: { messages: Array<{ content: string }> } = await req.json();
-
-    // Search the knowledge base for relevant information
+    const { messages } = await req.json();
     const lastMessage = messages[messages.length - 1].content;
-    const knowledgeBaseResults = await searchKnowledgeBase(lastMessage);
 
-    // Prepare the messages array with the knowledge base results
-    const contextMessages = knowledgeBaseResults.map(result => ({
-      role: 'system' as const,
-      content: `Relevant information: ${result.content}`,
-    }));
+    // Search knowledge base for context
+    const documents = await searchKnowledgeBase(lastMessage);
+    const context = documents.map(doc => doc.content).join('\n');
 
-    // Stream the AI response
-    const result = await streamText({
-      model: openai('gpt-4'),
-      system: `You are a helpful assistant. Check your knowledge base before answering any questions.
-      Only respond to questions using information from tool calls.
-      If no relevant information is found in the tool calls, respond, "Sorry, I don't know."`,
-      messages: [
-        ...contextMessages,
-        ...convertToCoreMessages(messages),
-      ],
+    // Create the messages array for OpenAI
+    const completionMessages = [
+      {
+        role: 'system',
+        content: `You are a helpful assistant that only answers based on the provided context. 
+        If you cannot find the answer in the context, say "I don't have enough information to answer that."
+        
+        Context:
+        ${context}`,
+      },
+      ...messages,
+    ];
+
+    // Create the completion with streaming
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: completionMessages,
+      stream: true,
     });
 
-    // Collect the full response
-    let fullResponse = '';
-    for await (const chunk of result.stream) {
-      fullResponse += chunk;
-    }
+    // Transform the response into a readable stream
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
 
-    // Create a resource with the full response
-    const resourceResult = await createResource({
-      title: `AI Response ${new Date().toISOString()}`,
-      content: fullResponse,
+        try {
+          for await (const chunk of response) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            if (content) {
+              controller.enqueue(encoder.encode(content));
+            }
+          }
+          controller.close();
+        } catch (error) {
+          controller.error(error);
+        }
+      },
     });
 
-    // Check if resource creation was successful
-    if (typeof resourceResult === 'object' && resourceResult.error) {
-      console.error('Failed to create resource:', resourceResult.error);
-    }
+    // Return a standard Response object with the stream
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+      },
+    });
 
-    // Return the AI result as a response
-    return new Response(fullResponse, { status: 200 });
-  } catch (err) {
-    console.error('An error occurred in POST handler:', err);
+  } catch (error) {
+    console.error('Error in chat route:', error);
     return new Response('Internal Server Error', { status: 500 });
   }
 }

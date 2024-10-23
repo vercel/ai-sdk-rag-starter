@@ -16,12 +16,13 @@
     "db:check": "drizzle-kit check"
   },
   "dependencies": {
+    "openai": "^4.0.0",
+    "@supabase/supabase-js": "^2.39.0",
     "@ai-sdk/openai": "^0.0.68",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
-    "@supabase/supabase-js": "^2.39.0",
     "@t3-oss/env-nextjs": "^0.10.1",
     "ai": "^3.4.17",
     "class-variance-authority": "^0.7.0",
