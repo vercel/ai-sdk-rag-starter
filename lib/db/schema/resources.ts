@@ -1,32 +1,38 @@
-import { sql } from "drizzle-orm";
-import { text, varchar, timestamp, pgTable } from "drizzle-orm/pg-core";
-import { createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
+import { z } from 'zod'
 
-import { nanoid } from "@/lib/utils";
+// Define the resource node schema
+export const ResourceSchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date()
+})
 
-export const resources = pgTable("resources", {
-  id: varchar("id", { length: 191 })
-    .primaryKey()
-    .$defaultFn(() => nanoid()),
-  content: text("content").notNull(),
+export type Resource = z.infer<typeof ResourceSchema>
 
-  createdAt: timestamp("created_at")
-    .notNull()
-    .default(sql`now()`),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .default(sql`now()`),
-});
+// Schema for creating a new resource
+export const CreateResourceSchema = ResourceSchema.omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+})
 
-// Schema for resources - used to validate API requests
-export const insertResourceSchema = createSelectSchema(resources)
-  .extend({})
-  .omit({
-    id: true,
-    createdAt: true,
-    updatedAt: true,
-  });
+export type CreateResourceInput = z.infer<typeof CreateResourceSchema>
 
-// Type for resources - used to type API request params and within Components
-export type NewResourceParams = z.infer<typeof insertResourceSchema>;
+// Cypher queries for resources
+export const ResourceQueries = {
+  create: `
+    CREATE (r:Resource {
+      id: $id,
+      content: $content,
+      createdAt: datetime(),
+      updatedAt: datetime()
+    })
+    RETURN r
+  `,
+  getById: `
+    MATCH (r:Resource {id: $id})
+    RETURN r
+  `,
+  // Add more queries as needed
+}
