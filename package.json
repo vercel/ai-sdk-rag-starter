@@ -13,7 +13,14 @@
     "db:pull": "drizzle-kit introspect",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:check": "drizzle-kit check"
+    "db:check": "drizzle-kit check",
+    "docker:db:build": "docker build -f database.Dockerfile -t rag_knowledge_base_postgres_pgvector .",
+    "docker:db:run": "docker run -d --name rag_knowledge_base_pgvector_db --env-file .env.db -p $(grep POSTGRES_PORT .env.db | cut -d '=' -f2):5432 rag_knowledge_base_postgres_pgvector",
+    "docker:db:stop": "docker stop rag_knowledge_base_pgvector_db 2>/dev/null || true && docker rm rag_knowledge_base_pgvector_db 2>/dev/null || true",
+    "docker:db:logs": "docker logs -f rag_knowledge_base_pgvector_db",
+    "docker:db:up": "npm run docker:db:stop && npm run docker:db:build && npm run docker:db:run",
+    "docker:db:prune": "docker stop rag_knowledge_base_pgvector_db 2>/dev/null || true && docker rm rag_knowledge_base_pgvector_db 2>/dev/null || true && docker volume prune -f",
+    "docker:db:prune-all": "docker stop rag_knowledge_base_pgvector_db 2>/dev/null || true && docker rm rag_knowledge_base_pgvector_db 2>/dev/null || true && docker volume rm pgvector_data 2>/dev/null || true && docker rmi rag_knowledge_base_postgres_pgvector 2>/dev/null || true"
   },
   "dependencies": {
     "@ai-sdk/openai": "2.0.0-beta.9",
